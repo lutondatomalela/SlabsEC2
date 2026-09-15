@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Generated outputs
+*.pdf
+*.xlsx
+*.xls
+*.csv
+!validation/*.csv
+*.log
+*.tmp
+
+# Local project data / working files
+input/
+inputs/
+output/
+outputs/
+results/
+reports/
+examples/local/
