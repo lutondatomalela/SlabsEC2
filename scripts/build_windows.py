@@ -37,12 +37,10 @@ def main():
                "--name", "SlabsEC2", "--version-file", str(metadata),
                "--collect-data", "reportlab", "--hidden-import", "openpyxl", "--hidden-import", "xlsxwriter"]
     assets = ROOT / "slabsec2/assets"
-    if (assets / "slabsec2.png").is_file():
-        from PIL import Image
-        with Image.open(assets / "slabsec2.png") as original:
-            icon = original.convert("RGBA")
-            icon.save(assets / "slabsec2.ico", sizes=[(16,16),(24,24),(32,32),(48,48),(64,64),(128,128),(256,256)])
-        command += ["--icon", str(assets / "slabsec2.ico"), "--add-data", f"{assets}:slabsec2/assets"]
+    for name in ("slabsec2.png", "slabsec2.ico"):
+        if not (assets / name).is_file():
+            raise SystemExit(f"Recurso obrigatório em falta: {name}")
+    command += ["--icon", str(assets / "slabsec2.ico"), "--add-data", f"{assets}:slabsec2/assets"]
     subprocess.run(command + ["main.py"], cwd=ROOT, check=True)
     environment = subprocess.check_output([sys.executable, "-m", "pip", "freeze"], text=True)
     info = {"application": "SlabsEC2", "version": version, "python": sys.version,

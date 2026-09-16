@@ -12,6 +12,7 @@ A primeira abertura pode demorar alguns segundos, enquanto os componentes são e
 
 ### Ajustes desta distribuição
 
+- Ícone próprio no executável e na janela da aplicação.
 - Arranque independente da pasta de trabalho e funcionamento sem consola.
 - Registo de erros em `%LOCALAPPDATA%\SlabsEC2\logs\SlabsEC2.log`.
 - Verificações automáticas executadas no próprio binário: 110 autotestes, 45 verificações técnicas, 138 comparações numéricas e 9114 controlos determinísticos.

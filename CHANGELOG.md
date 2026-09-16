@@ -2,6 +2,7 @@
 
 ## v2.16.0-rc1 - Reporting profissional
 - Preparação da distribuição autónoma Windows x64, compilada e testada pelo GitHub Actions.
+- Ícone original integrado no executável e na janela, com resoluções de 16 a 256 píxeis.
 - Arranque sem consola, registo de erros e exportação dos resultados dos testes para ficheiro.
 - Verificação do binário com interface, importação CSV/XLSX, cálculo e exportação PDF/XLSX.
 - Memória principal redesenhada em A4 vertical.

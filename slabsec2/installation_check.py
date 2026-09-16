@@ -10,6 +10,7 @@ def run_installation_check():
     import pandas as pd
     from openpyxl import load_workbook
     from .gui import SlabsEC2App
+    from .runtime import asset_path
 
     def fail(title, message, **kwargs):
         raise RuntimeError(f"{title}: {message}")
@@ -29,6 +30,12 @@ def run_installation_check():
             if not app.winfo_exists():
                 raise RuntimeError("Interface indisponível")
             checks.append("Interface Tk: OK")
+            if not hasattr(app, "_app_icon"):
+                raise RuntimeError("Ícone da janela indisponível")
+            for name in ("slabsec2.png", "slabsec2.ico"):
+                if not asset_path(name).is_file():
+                    raise RuntimeError(f"Recurso em falta: {name}")
+            checks.append("Ícones PNG/ICO incluídos: OK")
             app.withdraw()
             data = pd.DataFrame([
                 {"Panel": 1, "Node": node, "Case": case,
