@@ -1,0 +1,88 @@
+name: Windows executable
+
+on:
+  push:
+    branches: [main, build/windows-rc1]
+    paths:
+      - 'main.py'
+      - 'slabsec2/**'
+      - 'requirements-build.txt'
+      - 'scripts/**'
+      - '.github/workflows/windows.yml'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publicar uma versão ainda não existente após os testes
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          architecture: x64
+          cache: pip
+          cache-dependency-path: requirements-build.txt
+      - name: Instalar dependências de compilação
+        run: python -m pip install -r requirements-build.txt
+      - name: Verificar sintaxe Python
+        run: python -m compileall -q main.py slabsec2 scripts
+      - name: Compilar executável Windows
+        run: python scripts/build_windows.py
+      - name: Validar cálculo, interface e exportações no executável
+        run: python scripts/verify_windows.py
+      - name: Guardar distribuição validada
+        uses: actions/upload-artifact@v4
+        with:
+          name: SlabsEC2-windows-x64
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    needs: build
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.publish)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: SlabsEC2-windows-x64
+          path: dist
+      - name: Publicar Release Candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(python -c "import runpy; print(runpy.run_path('slabsec2/version.py')['VERSION'])")
+          tag="v${version}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "A versão $tag já está publicada; os ficheiros existentes foram preservados."
+            exit 0
+          fi
+          options=()
+          if [[ "$version" == *-* ]]; then options+=(--prerelease); fi
+          gh release create "$tag" dist/* --target "$GITHUB_SHA" \
+            --title "SlabsEC2 $tag — Windows x64" \
+            --notes-file docs/RELEASE-WINDOWS.md "${options[@]}"

@@ -36,3 +36,10 @@ outputs/
 results/
 reports/
 examples/local/
+
+# Compilação e distribuição
+.venv-build/
+build/
+dist/
+*.spec
+*.exe

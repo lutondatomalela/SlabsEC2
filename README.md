@@ -62,6 +62,14 @@ Podem ainda ser fornecidos `QXX`, `QYY`, `UGZ`, `NXX`, `NYY` e `NXY`. Na versão
 
 ## Instalação
 
+### Executável para Windows
+
+O executável para Windows x64 é distribuído na secção [Releases](https://github.com/lutondatomalela/SlabsEC2/releases). Descarregar o ficheiro `.exe` e abrir; não é necessário instalar Python.
+
+Consultar as [instruções de utilização e compilação para Windows](docs/WINDOWS.md).
+
+### Execução a partir do código-fonte
+
 Recomenda-se Python 3.10 ou superior.
 
 ```bash

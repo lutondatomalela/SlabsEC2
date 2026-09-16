@@ -1,0 +1,7 @@
+# Ambiente utilizado para a distribuição Windows x64 (Python 3.12).
+numpy==2.3.5
+pandas==2.2.3
+openpyxl==3.1.5
+xlsxwriter==3.2.9
+reportlab==4.4.9
+pyinstaller==6.16.0

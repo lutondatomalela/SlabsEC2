@@ -10,6 +10,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
 from ..version import *
+from ..runtime import apply_window_icon
 from ..utils import safe_float
 from ..importers import (
     parse_pasted_table, dataframe_to_tsv_preview, read_delimited_file_robust,
@@ -37,6 +38,7 @@ class SlabsEC2App(ReportExportMixin, ConfigIOMixin, tk.Tk):
     def __init__(self):
         super().__init__()
         self.title(APP_TITLE)
+        apply_window_icon(self)
         self.geometry("1220x720")
         self.minsize(900, 560)
 
