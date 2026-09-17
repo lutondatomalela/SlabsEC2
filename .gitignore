@@ -21,6 +21,8 @@ Thumbs.db
 
 # Generated outputs
 *.pdf
+# Artigo técnico distribuído com a documentação
+!docs/artigos/SlabsEC2_Artigo_P99_Nodal.pdf
 *.xlsx
 *.xls
 *.csv

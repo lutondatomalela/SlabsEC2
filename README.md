@@ -120,6 +120,16 @@ A política predefinida utiliza um **envelope distribuído baseado no P99 nodal*
 
 Regiões próximas de pilares, apoios, cargas concentradas, aberturas, alterações de geometria ou outras descontinuidades devem ser avaliadas pelo projetista antes da adoção da armadura final.
 
+### Artigo técnico sobre o P99 nodal
+
+O artigo **Tratamento estatístico P99 nodal no SlabsEC2** apresenta os fundamentos estatísticos, os critérios de seleção de nós, a preservação dos esforços RAW para verificação local e a interpretação dos resultados. Inclui exemplos numéricos reproduzíveis, limites de aplicação e referências bibliográficas em formato IEEE, com DOI quando disponível.
+
+- [Consultar o artigo em PDF](docs/artigos/SlabsEC2_Artigo_P99_Nodal.pdf).
+
+Documento de 16 de setembro de 2026, relativo à **v2.16.0-rc1**, revisão [`2fa4717`](https://github.com/lutondatomalela/SlabsEC2/tree/2fa4717c92eb8b5a17d5c7d64a4d51758090e01a).
+
+> **Âmbito:** documentação técnica explicativa da política **P99 nodal + RAW local**. Os exemplos demonstram a lógica do algoritmo, não constituindo validação experimental do desempenho estrutural nem substituindo a verificação das zonas locais pelo projetista.
+
 ## Limitações atuais
 
 Não estão incluídas, de forma automática, as seguintes verificações:
@@ -142,6 +152,9 @@ SlabsEC2/
 │   ├── geometry/
 │   └── ...
 ├── validation/
+├── docs/
+│   ├── artigos/
+│   └── WINDOWS.md
 ├── README.md
 ├── VALIDATION.md
 ├── CHANGELOG.md
