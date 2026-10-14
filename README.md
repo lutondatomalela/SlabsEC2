@@ -2,7 +2,7 @@
 
 **SlabsEC2** é uma ferramenta em Python para dimensionamento, verificação e auditoria de **lajes maciças de betão armado**, a partir de resultados de modelos estruturais com elementos de placa/casca.
 
-A versão atual é **v2.16.0-rc1 (Release Candidate)** e tem como referência principal a **NP EN 1992-1-1:2010**, incluindo as correções e alterações aplicáveis da **AC:2012** e **A1:2019**.
+A versão atual é **v2.16.0-rc2 (Release Candidate)** e tem como referência principal a **NP EN 1992-1-1:2010**, incluindo as correções e alterações aplicáveis da **AC:2012** e **A1:2019**.
 
 > **Estado do projeto:** Release Candidate. A ferramenta inclui verificações internas extensivas, mas não constitui software certificado e não substitui a revisão técnica do projetista.
 
