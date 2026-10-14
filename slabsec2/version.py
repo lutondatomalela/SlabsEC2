@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 APP_NAME = "SlabsEC2"
-VERSION = "2.16.0-rc1"
+VERSION = "2.16.0-rc2"
 APP_VERSION = f"v{VERSION}"
 APP_TITLE = f"SlabsEC2 {APP_VERSION} - Lajes Maciças de Betão Armado (EC2)"
 APP_AUTHOR = "https://github.com/lutondatomalela/SlabsEC2"

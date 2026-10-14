@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.16.0-rc2 — 2026-10-14 — desempenho XLSX
+- Escrita sequencial de baixa memória também para relatórios abaixo de 100 000 linhas, preservando as folhas temáticas e todas as colunas da tabela completa.
+- Formatos Excel reutilizados durante a escrita; eliminada a formatação posterior célula a célula com openpyxl.
+- Gravação temporária e substituição apenas após conclusão, preservando ficheiros existentes em caso de falha.
+- Testes de regressão para integridade dos valores, divisão por limite XLSX e preservação do ficheiro anterior.
+
 ## v2.16.0-rc1 - Reporting profissional
 - Preparação da distribuição autónoma Windows x64, compilada e testada pelo GitHub Actions.
 - Ícone original integrado no executável e na janela, com resoluções de 16 a 256 píxeis.
