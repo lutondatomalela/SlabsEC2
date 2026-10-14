@@ -211,127 +211,25 @@ class ReportExportMixin:
             self.status_var.set("A escrever folhas Excel...")
             self.update_idletasks()
 
-            with pd.ExcelWriter(path, engine="openpyxl") as writer:
-                excel_data_limit = XLSX_DATA_ROWS_PER_SHEET
-                for i, (name, df) in enumerate(sheets):
-                    df_to_write = df if has_df(df) else pd.DataFrame({"Nota": ["Sem dados disponíveis."]})
-                    if len(df_to_write) <= excel_data_limit:
-                        df_to_write.to_excel(writer, sheet_name=safe_sheet_name(name), index=False)
-                    else:
-                        # XLSX tem limite físico de 1 048 576 linhas por folha.
-                        for part, start in enumerate(range(0, len(df_to_write), excel_data_limit), start=1):
-                            chunk = df_to_write.iloc[start:start + excel_data_limit]
-                            chunk_name = safe_sheet_name(f"{name}_{part}")
-                            chunk.to_excel(writer, sheet_name=chunk_name, index=False)
-                    self.progress_var.set(15.0 + 45.0 * (i + 1) / max(1, len(sheets)))
-                    self.status_var.set(f"A escrever folha {i+1}/{len(sheets)}: {name}")
-                    self.update_idletasks()
+            index_rows = pd.DataFrame([
+                [name, self._excel_sheet_description(name)] for name, _ in sheets
+            ], columns=readme.columns)
+            readme = pd.concat([readme, index_rows], ignore_index=True)
+            sheets = [(name, readme if name == "00_README" else df) for name, df in sheets]
 
-                # ---- formatação profissional do workbook ----
-                from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
-                from openpyxl.utils import get_column_letter
-                from openpyxl.formatting.rule import FormulaRule
+            from ..xlsx_export import write_workbook
 
-                wb = writer.book
-                props = wb.properties
-                props.title = f"{APP_NAME} - Resultados de Cálculo"
-                props.subject = APP_SUBJECT
-                props.creator = ""
-                props.lastModifiedBy = ""
-                props.description = APP_XLSX_DESCRIPTION
-                props.keywords = APP_KEYWORDS
-                props.category = APP_CATEGORY
-                props.created = export_dt
-                props.modified = export_dt
+            def progress(done, total, name):
+                self.progress_var.set(15.0 + 80.0 * done / max(total, 1))
+                self.status_var.set(f"A exportar Excel: {name} ({done:,}/{total:,} linhas)")
+                self.update_idletasks()
 
-                header_fill = PatternFill("solid", fgColor="1F4E78")
-                header_font = Font(color="FFFFFF", bold=True)
-                title_fill = PatternFill("solid", fgColor="D9EAF7")
-                light_fill = PatternFill("solid", fgColor="F7F9FB")
-                thin = Side(style="thin", color="D9E2EC")
-                border = Border(left=thin, right=thin, top=thin, bottom=thin)
-
-                for ws in wb.worksheets:
-                    ws.freeze_panes = "A2"
-                    ws.sheet_view.showGridLines = False
-                    max_row = ws.max_row
-                    max_col = ws.max_column
-                    if max_row >= 1 and max_col >= 1:
-                        ws.auto_filter.ref = ws.dimensions
-                        for cell in ws[1]:
-                            cell.fill = header_fill
-                            cell.font = header_font
-                            cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-                            cell.border = border
-                        ws.row_dimensions[1].height = 24
-                        for row in ws.iter_rows(min_row=2, max_row=max_row, max_col=max_col):
-                            for cell in row:
-                                cell.border = border
-                                cell.alignment = Alignment(vertical="top", wrap_text=True)
-                                if isinstance(cell.value, float):
-                                    cell.number_format = "0.000"
-                        # zebra leve para legibilidade
-                        for r in range(2, max_row + 1):
-                            if r % 2 == 0:
-                                for c in range(1, max_col + 1):
-                                    ws.cell(r, c).fill = light_fill
-
-                    # larguras de colunas com limites para evitar folhas ilegíveis
-                    for col_idx in range(1, max_col + 1):
-                        letter = get_column_letter(col_idx)
-                        header = str(ws.cell(1, col_idx).value or "")
-                        sample_vals = [str(ws.cell(r, col_idx).value or "") for r in range(1, min(max_row, 80) + 1)]
-                        width = max([len(header)] + [min(len(v), 50) for v in sample_vals]) + 2
-                        if any(k in header.lower() for k in ["note", "nota", "reason", "action", "problema", "descrição", "descricao", "croquis"]):
-                            width = min(max(width, 22), 46)
-                        elif any(k in header.lower() for k in ["status", "case", "panel", "node"]):
-                            width = min(max(width, 10), 18)
-                        else:
-                            width = min(max(width, 10), 22)
-                        ws.column_dimensions[letter].width = width
-
-                    # formatação especial por folha
-                    if ws.title in {"00_METADATA", "00_README", "01_Input_Data"}:
-                        ws.column_dimensions["A"].width = 28
-                        ws.column_dimensions["B"].width = 80
-                        for row in ws.iter_rows(min_row=2, max_row=max_row):
-                            if row and row[0].value:
-                                row[0].font = Font(bold=True, color="1F4E78")
-
-                    # Condicionais em colunas de estado/status
-                    headers = {str(ws.cell(1, c).value): c for c in range(1, max_col + 1)}
-                    for status_header in ["Status", "Status_global", "Estado", "Crack_control_status"]:
-                        if status_header in headers and max_row > 1:
-                            col = get_column_letter(headers[status_header])
-                            rng = f"{col}2:{col}{max_row}"
-                            ws.conditional_formatting.add(rng, FormulaRule(formula=[f'ISNUMBER(SEARCH("Não conforme",{col}2))'], fill=PatternFill("solid", fgColor="F4CCCC")))
-                            ws.conditional_formatting.add(rng, FormulaRule(formula=[f'ISNUMBER(SEARCH("Verificar",{col}2))'], fill=PatternFill("solid", fgColor="FFF2CC")))
-                            ws.conditional_formatting.add(rng, FormulaRule(formula=[f'ISNUMBER(SEARCH("OK",{col}2))'], fill=PatternFill("solid", fgColor="D9EAD3")))
-
-                # Larguras específicas em folhas densas
-                for dense in ["15_Full_Results", "16_Raw_Table"]:
-                    if dense in wb.sheetnames:
-                        ws = wb[dense]
-                        ws.freeze_panes = "A2"
-                        # sheet muito densa fica no fim e serve apenas para auditoria
-                        for col_idx in range(1, ws.max_column + 1):
-                            ws.column_dimensions[get_column_letter(col_idx)].width = 14
-
-                # Índice visual na primeira folha
-                if "00_README" in wb.sheetnames:
-                    ws = wb["00_README"]
-                    start = ws.max_row + 3
-                    ws.cell(start, 1, "Índice de folhas").font = Font(bold=True, color="1F4E78")
-                    ws.cell(start, 1).fill = title_fill
-                    ws.cell(start, 2).fill = title_fill
-                    ws.cell(start, 1).border = border
-                    ws.cell(start, 2).border = border
-                    for j, sheet_name in enumerate(wb.sheetnames, start=start + 1):
-                        ws.cell(j, 1, sheet_name)
-                        ws.cell(j, 2, self._excel_sheet_description(sheet_name) if hasattr(self, "_excel_sheet_description") else "")
-                        ws.cell(j, 1).border = border
-                        ws.cell(j, 2).border = border
-                    ws.auto_filter.ref = f"A1:B{ws.max_row}"
+            write_workbook(path, sheets, progress=progress, properties={
+                "title": f"{APP_NAME} - Resultados de Cálculo",
+                "subject": APP_SUBJECT, "author": "",
+                "comments": APP_XLSX_DESCRIPTION, "keywords": APP_KEYWORDS,
+                "category": APP_CATEGORY,
+            })
 
             self.progress_var.set(100.0)
             self.status_var.set(f"Excel organizado exportado: {path}")
