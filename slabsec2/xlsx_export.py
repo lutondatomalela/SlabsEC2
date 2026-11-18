@@ -22,8 +22,8 @@ def write_workbook(path, sheets, progress=None, properties=None):
             'strings_to_formulas': False, 'nan_inf_to_errors': True,
         }) as book:
             book.set_properties(properties or {})
-            header = book.add_format({'bold': True, 'font_color': 'white',
-                                      'bg_color': '#1F4E78', 'text_wrap': True})
+            header = book.add_format({'bold': True, 'font_color': '#20262B',
+                                      'bg_color': '#E5E7EB', 'text_wrap': True})
             numeric = book.add_format({'num_format': '0.000', 'valign': 'top'})
             text = book.add_format({'valign': 'top'})
             for name, df in sheets:

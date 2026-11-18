@@ -367,7 +367,7 @@ class ReportExportMixin:
         def write_df(workbook, name, df, sheet_no, n_sheets):
             name = str(name)[:31]
             ws = workbook.add_worksheet(name)
-            header_fmt = workbook.add_format({"bold": True, "font_color": "white", "bg_color": "#1F4E78", "align": "center", "valign": "vcenter", "text_wrap": True, "border": 1})
+            header_fmt = workbook.add_format({"bold": True, "font_color": "#20262B", "bg_color": "#E5E7EB", "align": "center", "valign": "vcenter", "text_wrap": True, "border": 1})
             text_fmt = workbook.add_format({"valign": "top"})
             num_fmt = workbook.add_format({"num_format": "0.000", "valign": "top"})
             ws.freeze_panes(1, 0)
@@ -565,6 +565,7 @@ class ReportExportMixin:
             navy = colors.HexColor("#243746")
             blue = colors.HexColor("#3D5A73")
             pale_blue = colors.HexColor("#EAF0F4")
+            header_fill = colors.HexColor("#E5E7EB")
             light = colors.HexColor("#F6F7F8")
             border = colors.HexColor("#D8DEE3")
             dark = colors.HexColor("#20262B")
@@ -584,7 +585,7 @@ class ReportExportMixin:
                 "Small": ParagraphStyle("Small", parent=base_styles["Normal"], fontName="Courier", fontSize=7.8, leading=10.5, textColor=dark),
                 "Tiny": ParagraphStyle("Tiny", parent=base_styles["Normal"], fontName="Courier", fontSize=6.8, leading=8.8, textColor=dark),
                 "Cell": ParagraphStyle("Cell", parent=base_styles["Normal"], fontName="Courier", fontSize=7.4, leading=9.5, textColor=dark),
-                "CellC": ParagraphStyle("CellC", parent=base_styles["Normal"], fontName="Courier", fontSize=7.4, leading=9.5, alignment=TA_CENTER, textColor=dark),
+                "TableHeader": ParagraphStyle("TableHeader", parent=base_styles["Normal"], fontName="Courier-Bold", fontSize=7.4, leading=9.5, alignment=TA_CENTER, textColor=dark),
                 "CellR": ParagraphStyle("CellR", parent=base_styles["Normal"], fontName="Courier", fontSize=7.4, leading=9.5, alignment=TA_RIGHT, textColor=dark),
                 "Note": ParagraphStyle("Note", parent=base_styles["Normal"], fontName="Courier", fontSize=8, leading=11.5, textColor=muted, leftIndent=5*mm, borderColor=border, borderWidth=0.5, borderPadding=5, spaceBefore=4, spaceAfter=6),
             }
@@ -662,7 +663,8 @@ class ReportExportMixin:
             def make_table(headers, rows, widths=None, header=True, small=False, align_right=None):
                 data = []
                 if header:
-                    data.append([Paragraph(_esc(x), styles["CellC"]) for x in headers])
+                    # Paragraph mantém a sua própria cor e fonte; TableStyle não as substitui.
+                    data.append([Paragraph(_esc(x), styles["TableHeader"]) for x in headers])
                 for row in rows:
                     cells=[]
                     for j, x in enumerate(row):
@@ -679,7 +681,7 @@ class ReportExportMixin:
                     ("BOTTOMPADDING", (0,0), (-1,-1), 3.5),
                 ]
                 if header:
-                    cmds += [("BACKGROUND", (0,0), (-1,0), navy), ("TEXTCOLOR", (0,0), (-1,0), colors.white), ("FONTNAME", (0,0), (-1,0), "Courier-Bold")]
+                    cmds += [("BACKGROUND", (0,0), (-1,0), header_fill), ("TEXTCOLOR", (0,0), (-1,0), dark), ("FONTNAME", (0,0), (-1,0), "Courier-Bold")]
                 t.setStyle(TableStyle(cmds))
                 return t
 

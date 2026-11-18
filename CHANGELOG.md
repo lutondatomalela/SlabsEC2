@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.16.0-rc3 — 2026-11-18 — legibilidade dos relatórios
+- Cabeçalhos das tabelas em cinzento claro, com texto escuro a negrito, na memória de cálculo e na auditoria PDF.
+- Estilo de parágrafo próprio para os cabeçalhos PDF, corrigindo a aplicação da cor e da fonte nas células.
+- Cabeçalhos Excel com a mesma paleta, incluindo a exportação de grandes tabelas.
+- Alterações de apresentação; motor de cálculo e valores exportados preservados.
+
 ## v2.16.0-rc2 — 2026-10-14 — desempenho XLSX
 - Escrita sequencial de baixa memória também para relatórios abaixo de 100 000 linhas, preservando as folhas temáticas e todas as colunas da tabela completa.
 - Formatos Excel reutilizados durante a escrita; eliminada a formatação posterior célula a célula com openpyxl.
